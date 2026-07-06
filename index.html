@@ -533,11 +533,11 @@
     URL.revokeObjectURL(url);
   });
 
-  /* ---------- Musik ---------- */
+    /* ---------- Musik ---------- */
   let audioEl = null, synth = null, reverb = null, isPlaying = false, initialized = false;
   const musicBtn = document.getElementById('musicBtn');
 
-  function initGenerativeMusic(){
+  function initGenerativeMusic() {
     reverb = new Tone.Reverb({decay:5, wet:0.4}).toDestination();
     synth = new Tone.PolySynth(Tone.AMSynth, {
       volume: -20,
@@ -552,37 +552,40 @@
     }, "1n");
   }
 
-  function startMusic(){
-    if(invitationData.AUDIO_URL){
-      if(!audioEl){
+  function startMusic() {
+    // Memastikan Audio Context dari library Tone.js aktif (jika menggunakan musik generatif)
+    if (window.Tone) {
+      Tone.start();
+    }
+
+    if (invitationData.AUDIO_URL) {
+      if (!audioEl) {
         audioEl = new Audio(invitationData.AUDIO_URL);
         audioEl.loop = true;
-        audioEl.volume = 0.5;
+        audioEl.volume = 0.4;
+        // preload audio agar siap putar
+        audioEl.preload = "auto"; 
       }
-      audioEl.play().then(function(){
-        isPlaying = true; musicBtn.classList.add('spinning');
-      }).catch(function(){});
-    } else {
-      Tone.start().then(function(){
-        if(!initialized){ initGenerativeMusic(); initialized = true; }
+      
+      // Paksa putar audio begitu fungsi dipanggil
+      audioEl.play().then(function() {
+        isPlaying = true; 
+        musicBtn.classList.add('spinning');
+      }).catch(function(err) {
+        console.log("Autoplay gagal, mencoba musik alternatif generatif:", err);
+        // Fallback otomatis ke musik instrumen jika link MP3 eksternal error/terblokir
+        if (!initialized) { initGenerativeMusic(); initialized = true; }
         Tone.Transport.start();
         isPlaying = true;
         musicBtn.classList.add('spinning');
       });
+    } else {
+      if (!initialized) { initGenerativeMusic(); initialized = true; }
+      Tone.Transport.start();
+      isPlaying = true;
+      musicBtn.classList.add('spinning');
     }
   }
-
-  musicBtn.addEventListener('click', function(){
-    if(invitationData.AUDIO_URL && audioEl){
-      if(isPlaying){ audioEl.pause(); isPlaying=false; musicBtn.classList.remove('spinning'); }
-      else{ audioEl.play(); isPlaying=true; musicBtn.classList.add('spinning'); }
-    } else if(initialized){
-      if(isPlaying){ Tone.Transport.pause(); isPlaying=false; musicBtn.classList.remove('spinning'); }
-      else{ Tone.Transport.start(); isPlaying=true; musicBtn.classList.add('spinning'); }
-    } else {
-      startMusic();
-    }
-  });
 
   /* ---------- Ucapan (RSVP + Buku Tamu, tersimpan bersama) ---------- */
   const WISH_KEY = 'aqiqah-wishes-list';
