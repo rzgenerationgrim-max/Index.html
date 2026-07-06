@@ -120,12 +120,17 @@
   .panel .corner{opacity:0.25;}
 
   /* profile */
-  .baby-portrait{
+    .baby-portrait{
     width:130px; height:130px; margin:0 auto 20px; border-radius:50%;
     border:3px solid var(--gold); display:flex; align-items:center; justify-content:center;
     background:linear-gradient(160deg,#f7ecd9,#efe0c2);
+    overflow: hidden; /* Tambahkan ini untuk memotong gambar */
   }
-  .baby-portrait svg{width:70%; height:70%;}
+  .baby-portrait img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Tambahkan ini agar foto tidak gepeng/lebar */
+  }
   .profile-name{
     text-align:center; font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600;
     font-size:28px; margin-bottom:2px;
@@ -260,30 +265,29 @@
       <div class="section-eyebrow">Ananda Kami</div>
       <h2 class="section-title">Profil Sang Buah Hati</h2>
 
-      <div class="baby-portrait">
+      <div class="panel">
+        <div class="baby-portrait">
   <img src="profil-bayi.jpg" alt="Foto Profil Bayi Muhammad Ziyad Al-Gifari">
 </div>
-          </svg>
-        </div>
         <div class="profile-name" id="babyFullName">Muhammad Fatih Al-Ghazali</div>
         <div class="profile-sub" id="birthOrderText">Putra Pertama</div>
 
-        <div class="detail-grid">
+                <div class="detail-grid">
           <div class="detail-item">
             <div class="detail-label">Lahir</div>
-            <div class="detail-value" id="birthDate">12 Jun 2026</div>
+            <div class="detail-value" id="birthDate">15 Juni 2026</div>
           </div>
           <div class="detail-item">
             <div class="detail-label">Berat</div>
             <div class="detail-value" id="birthWeight">3.2 kg</div>
           </div>
           <div class="detail-item">
-            <div class="detail-label">Panjang</div>
-            <div class="detail-value" id="birthLength">49 cm</div>
+            <div class="detail-label">Kelamin</div>
+            <div class="detail-value">Laki-laki</div>
           </div>
           <div class="detail-item">
             <div class="detail-label">Anak ke</div>
-            <div class="detail-value" id="birthOrderNum">1</div>
+            <div class="detail-value" id="birthOrderNum">3</div>
           </div>
         </div>
 
@@ -385,7 +389,7 @@
       <div class="signature-family" id="hostFamily">Kel. Ahmad Zainuddin</div>
     </section>
 
-    <footer>Dibuat Oleh FAHRUL ISLAMI — Undangan Digital (Kios Faizar)</footer>
+    <footer>Dibuat Oleh FAHRUL ISLAMI — Undangan Digital Deplover by : Kios Faizar™</footer>
   </main>
 </div>
 
@@ -415,14 +419,14 @@
     eventTimeDisplay: "09.00 WITA — Selesai", // sesuaikan jam acara sebenarnya
     venueName: "Kediaman Bapak Irfandi Gunawan",
     venueAddress: "BTN Griya Lamaloang Blok H 17",
-    mapsQuery: "BTN Griya Lamaloang Blok H 17", // dipakai untuk embed peta & tombol buka Google Maps
+    mapsQuery: "-5,5541511, 120,1800033", // dipakai untuk embed peta & tombol buka Google Maps
     hostFamily: "Kel. Irfandi Gunawan",
     // Kosongkan AUDIO_URL untuk memakai musik ambient otomatis (generatif),
     // atau isi dengan link mp3 Anda sendiri, contoh: "https://domainanda.com/musik.mp3"
     AUDIO_URL: "musik-kita.mp3"
   };
 
-  /* ---------- Isi data ke halaman ---------- */
+    /* ---------- Isi data ke halaman ---------- */
   const params = new URLSearchParams(window.location.search);
   const guestParam = params.get('to');
   document.getElementById('guestName').textContent = guestParam ? decodeURIComponent(guestParam) : 'Tamu Undangan';
@@ -433,7 +437,6 @@
   document.getElementById('birthOrderText').textContent = invitationData.birthOrderText;
   document.getElementById('birthDate').textContent = invitationData.birthDate;
   document.getElementById('birthWeight').textContent = invitationData.birthWeight;
-  document.getElementById('birthLength').textContent = invitationData.birthLength;
   document.getElementById('birthOrderNum').textContent = invitationData.birthOrderNum;
   document.getElementById('parentsLine').innerHTML = invitationData.parentsHtml;
   document.getElementById('eventDateDisplay').textContent = invitationData.eventDateDisplay;
@@ -441,10 +444,23 @@
   document.getElementById('venueName').textContent = invitationData.venueName;
   document.getElementById('venueAddress').innerHTML = invitationData.venueAddress.replace(/, /g, ',<br>');
   document.getElementById('hostFamily').textContent = invitationData.hostFamily;
-  document.getElementById('mapFrame').src = "https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery) + "&z=15&output=embed";
+    // 1. Menampilkan peta kotak interaktif yang akurat sesuai koordinat Anda
+    // 1. Menampilkan peta kotak interaktif
+  document.getElementById('mapFrame').src = "https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery) + "&t=&z=16&ie=UTF8&iwloc=&output=embed";
 
+  // 2. Mengatur fungsi klik tombol peta
   document.getElementById('mapBtn').addEventListener('click', function(){
-    window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(invitationData.mapsQuery + ' ' + invitationData.venueAddress), '_blank');
+    window.open("https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery), '_blank');
+  });
+
+  document.getElementById('hostFamily').textContent = invitationData.hostFamily;
+      /* ---------- Pengaturan Peta dan Tombol Maps Terverifikasi ---------- */
+  // 1. Menampilkan peta kotak interaktif yang akurat sesuai koordinat Anda
+  document.getElementById('mapFrame').src = "https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery) + "&t=&z=16&ie=UTF8&iwloc=&output=embed";
+
+  // 2. Mengatur tombol agar membuka aplikasi Google Maps asli saat diklik tamu
+  document.getElementById('mapBtn').addEventListener('click', function(){
+    window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(invitationData.mapsQuery), '_blank');
   });
   document.getElementById('copyBtn').addEventListener('click', function(){
     const text = invitationData.venueName + ", " + invitationData.venueAddress;
