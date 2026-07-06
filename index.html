@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Undangan Aqiqah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Tangerine:wght@400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald-deep:#0d231c;
+    --emerald:#14332a;
+    --emerald-light:#1e4638;
+    --gold:#c9a54b;
+    --gold-soft:#e3c98a;
+    --blush:#e3b7b0;
+    --ivory:#fbf6ec;
+    --ink:#2b2a25;
+    --cream-text:#f2ead8;
+    --shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Jost', sans-serif;
+    background: radial-gradient(ellipse at top, var(--emerald-light) 0%, var(--emerald-deep) 70%);
+    color:var(--cream-text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    overflow-x:hidden;
+  }
+  .card{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    position:relative;
+    background:linear-gradient(180deg, var(--emerald) 0%, var(--emerald-deep) 100%);
+    box-shadow:var(--shadow);
+  }
+
+  /* ---------- Ornamental SVG bits ---------- */
+  .corner{position:absolute; width:70px; height:70px; opacity:0.55; pointer-events:none;}
+  .corner svg{width:100%; height:100%;}
+  .corner.tl{top:14px; left:14px;}
+  .corner.tr{top:14px; right:14px; transform:scaleX(-1);}
+  .corner.bl{bottom:14px; left:14px; transform:scaleY(-1);}
+  .corner.br{bottom:14px; right:14px; transform:scale(-1,-1);}
+
+  .divider{
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    margin:28px 0; opacity:0.85;
+  }
+  .divider .line{flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent); max-width:80px;}
+  .divider svg{width:22px; height:22px;}
+
+  /* ---------- Cover ---------- */
+  #cover{
+    position:fixed; inset:0; z-index:50;
+    max-width:480px; margin:0 auto;
+    background:radial-gradient(ellipse at top, var(--emerald-light) 0%, var(--emerald-deep) 75%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:40px 30px;
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  #cover.hide{opacity:0; transform:scale(1.05); pointer-events:none;}
+  .arch-frame{width:220px; height:280px; margin-bottom:18px; position:relative;}
+  .arch-frame svg{width:100%; height:100%;}
+  .eyebrow{
+    font-size:12px; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold-soft); margin-bottom:6px;
+  }
+  .to-guest{font-size:14px; color:var(--cream-text); opacity:0.85; margin-bottom:4px;}
+  .to-name{font-family:'Cormorant Garamond', serif; font-style:italic; font-size:20px; color:var(--gold-soft); margin-bottom:22px;}
+  .baby-name-script{
+    font-family:'Tangerine', cursive;
+    font-size:64px; line-height:1;
+    color:var(--ivory);
+    margin:6px 0 4px;
+  }
+  .baby-name-sub{
+    font-family:'Cormorant Garamond', serif; font-size:15px; letter-spacing:2px;
+    color:var(--cream-text); opacity:0.8; margin-bottom:26px;
+  }
+  .btn-open{
+    font-family:'Jost', sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase;
+    background:transparent; color:var(--gold-soft); border:1px solid var(--gold);
+    padding:14px 34px; border-radius:2px; cursor:pointer;
+    transition:all .35s ease;
+  }
+  .btn-open:hover, .btn-open:focus-visible{background:var(--gold); color:var(--emerald-deep); outline:none;}
+
+  /* floating petals */
+  .petal{position:absolute; width:6px; height:6px; border-radius:50% 0; background:var(--gold-soft); opacity:.5; animation:fall linear infinite;}
+  @keyframes fall{
+    from{transform:translateY(-10px) rotate(0deg); opacity:.6;}
+    to{transform:translateY(320px) rotate(360deg); opacity:0;}
+  }
+
+  /* ---------- Sections ---------- */
+  main{opacity:0; transition:opacity 1.2s ease .1s;}
+  main.show{opacity:1;}
+  section{padding:64px 28px; position:relative;}
+  .reveal{opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s ease;}
+  .reveal.in{opacity:1; transform:none;}
+
+  .section-eyebrow{
+    text-align:center; font-size:11px; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold-soft); margin-bottom:8px;
+  }
+  h2.section-title{
+    text-align:center; font-family:'Cormorant Garamond', serif; font-weight:500; font-style:italic;
+    font-size:34px; color:var(--ivory); margin-bottom:30px;
+  }
+
+  .panel{
+    background:var(--ivory); color:var(--ink); border-radius:6px;
+    padding:32px 24px; box-shadow:var(--shadow); position:relative;
+  }
+  .panel .corner{opacity:0.25;}
+
+  /* profile */
+  .baby-portrait{
+    width:130px; height:130px; margin:0 auto 20px; border-radius:50%;
+    border:3px solid var(--gold); display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#f7ecd9,#efe0c2);
+  }
+  .baby-portrait svg{width:70%; height:70%;}
+  .profile-name{
+    text-align:center; font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600;
+    font-size:28px; margin-bottom:2px;
+  }
+  .profile-sub{text-align:center; font-size:13px; letter-spacing:1px; opacity:0.7; margin-bottom:22px;}
+  .detail-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px 12px; margin-top:10px;}
+  .detail-item{text-align:center; border-top:1px solid rgba(0,0,0,0.08); padding-top:12px;}
+  .detail-label{font-size:10px; letter-spacing:1.5px; text-transform:uppercase; opacity:0.55; margin-bottom:4px;}
+  .detail-value{font-family:'Cormorant Garamond', serif; font-size:19px; font-weight:600;}
+  .parents-line{text-align:center; margin-top:22px; font-size:14.5px; line-height:1.7;}
+
+  /* acara */
+  .countdown{display:flex; justify-content:center; gap:10px; margin-bottom:28px;}
+  .count-box{
+    background:var(--ivory); color:var(--ink); border-radius:6px; padding:12px 10px; min-width:60px;
+    text-align:center; box-shadow:var(--shadow);
+  }
+  .count-num{font-family:'Cormorant Garamond', serif; font-size:26px; font-weight:600;}
+  .count-label{font-size:9px; letter-spacing:1px; text-transform:uppercase; opacity:0.6;}
+
+  .agenda-list{list-style:none; margin-top:18px;}
+  .agenda-list li{
+    display:flex; gap:14px; padding:12px 0; border-bottom:1px dashed rgba(0,0,0,0.12);
+    font-size:14.5px; align-items:baseline;
+  }
+  .agenda-list li:last-child{border-bottom:none;}
+  .agenda-num{font-family:'Cormorant Garamond', serif; font-style:italic; color:var(--gold); font-size:15px; min-width:20px;}
+  .event-meta{text-align:center; margin-bottom:22px;}
+  .event-date{font-family:'Cormorant Garamond', serif; font-size:24px; font-weight:600;}
+  .event-time{font-size:14px; opacity:0.75; margin-top:2px;}
+
+  .btn-gold{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; margin-top:20px; padding:13px; border:none; border-radius:4px;
+    background:var(--emerald); color:var(--gold-soft); font-family:'Jost', sans-serif;
+    font-size:13px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
+    transition:background .3s ease;
+  }
+  .btn-gold:hover, .btn-gold:focus-visible{background:var(--emerald-light); outline:none;}
+
+  /* lokasi */
+  .map-frame{width:100%; height:220px; border:0; border-radius:6px; margin-bottom:16px; filter:sepia(8%) saturate(90%);}
+  .address-box{font-size:14px; line-height:1.6; text-align:center; margin-bottom:6px;}
+  .venue-name{font-family:'Cormorant Garamond', serif; font-size:20px; font-weight:600; text-align:center; margin-bottom:6px;}
+
+  /* ucapan */
+  .rsvp-form{display:flex; flex-direction:column; gap:12px;}
+  .rsvp-form input, .rsvp-form textarea{
+    font-family:'Jost', sans-serif; font-size:14px; padding:12px 14px; border:1px solid rgba(0,0,0,0.15);
+    border-radius:4px; background:#fff; color:var(--ink); resize:none;
+  }
+  .rsvp-form input:focus, .rsvp-form textarea:focus{outline:2px solid var(--gold); border-color:var(--gold);}
+  .rsvp-options{display:flex; gap:8px;}
+  .rsvp-options label{
+    flex:1; text-align:center; font-size:12px; padding:10px 4px; border:1px solid rgba(0,0,0,0.15);
+    border-radius:4px; cursor:pointer; transition:all .2s ease;
+  }
+  .rsvp-options input{display:none;}
+  .rsvp-options input:checked + span{display:block;}
+  .rsvp-options label:has(input:checked){background:var(--emerald); color:var(--gold-soft); border-color:var(--emerald);}
+  .wishes-list{margin-top:26px; display:flex; flex-direction:column; gap:14px; max-height:320px; overflow-y:auto; padding-right:4px;}
+  .wish-item{border-left:2px solid var(--gold); padding:6px 0 6px 14px;}
+  .wish-name{font-weight:600; font-size:14px;}
+  .wish-status{font-size:10px; letter-spacing:1px; text-transform:uppercase; opacity:0.55; margin-left:6px;}
+  .wish-msg{font-size:13.5px; line-height:1.5; margin-top:2px; opacity:0.85;}
+  .wish-empty{text-align:center; font-size:13px; opacity:0.55; padding:20px 0;}
+  .form-note{font-size:11px; text-align:center; opacity:0.55; margin-top:4px;}
+
+  /* penutup */
+  .doa-text{
+    font-family:'Cormorant Garamond', serif; font-style:italic; font-size:18px; line-height:1.8;
+    text-align:center; color:var(--ivory); padding:0 8px;
+  }
+  .closing-thanks{text-align:center; font-size:14px; line-height:1.8; margin-top:22px; color:var(--cream-text); opacity:0.9;}
+  .signature-family{
+    text-align:center; font-family:'Tangerine', cursive; font-size:40px; color:var(--gold-soft); margin-top:18px;
+  }
+  footer{text-align:center; padding:26px 20px 40px; font-size:11px; opacity:0.4; letter-spacing:1px;}
+
+  /* music toggle */
+  #musicBtn{
+    position:fixed; z-index:40; bottom:20px; right:calc(50% - 240px + 20px);
+    width:46px; height:46px; border-radius:50%; border:1px solid var(--gold);
+    background:var(--emerald-deep); color:var(--gold-soft); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);
+  }
+  @media (max-width:520px){ #musicBtn{ right:20px; } }
+  #musicBtn svg{width:20px; height:20px;}
+  #musicBtn.spinning svg{animation:spin 4s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div id="cover">
+  <div class="corner tl"><svg viewBox="0 0 70 70"><path d="M2 2 L2 30 Q2 2 30 2" stroke="#c9a54b" fill="none" stroke-width="1.4"/><circle cx="2" cy="2" r="3" fill="#c9a54b"/></svg></div>
+  <div class="corner tr"><svg viewBox="0 0 70 70"><path d="M2 2 L2 30 Q2 2 30 2" stroke="#c9a54b" fill="none" stroke-width="1.4"/><circle cx="2" cy="2" r="3" fill="#c9a54b"/></svg></div>
+
+  <div class="eyebrow">Aqiqah &amp; Tasyakuran</div>
+
+  <div class="arch-frame">
+    <svg viewBox="0 0 220 280" fill="none">
+      <path d="M20 280 V150 Q20 40 110 40 Q200 40 200 150 V280" stroke="#c9a54b" stroke-width="2"/>
+      <path d="M36 280 V150 Q36 58 110 58 Q184 58 184 150 V280" stroke="#e3c98a" stroke-width="1" opacity="0.6"/>
+      <circle cx="110" cy="95" r="5" fill="#c9a54b"/>
+      <path d="M85 95 Q110 78 135 95" stroke="#c9a54b" stroke-width="1" fill="none" opacity="0.7"/>
+    </svg>
+  </div>
+
+  <div class="to-guest">Kepada Yth. Bapak / Ibu / Saudara-i</div>
+  <div class="to-name" id="guestName">Tamu Undangan</div>
+
+  <div class="baby-name-script" id="coverBabyName">Fatih</div>
+  <div class="baby-name-sub" id="coverBabyFull">MUHAMMAD FATIH AL-GHAZALI</div>
+
+  <button class="btn-open" id="openBtn">✦ Buka Undangan ✦</button>
+</div>
+
+<!-- ============ CARD ============ -->
+<div class="card">
+  <main id="main">
+
+    <!-- PROFIL -->
+    <section id="profil" class="reveal">
+      <div class="corner tl"><svg viewBox="0 0 70 70"><path d="M2 2 L2 30 Q2 2 30 2" stroke="#e3b7b0" fill="none" stroke-width="1.2"/></svg></div>
+      <div class="corner tr"><svg viewBox="0 0 70 70"><path d="M2 2 L2 30 Q2 2 30 2" stroke="#e3b7b0" fill="none" stroke-width="1.2"/></svg></div>
+      <div class="section-eyebrow">Ananda Kami</div>
+      <h2 class="section-title">Profil Sang Buah Hati</h2>
+
+      <div class="panel">
+        <div class="baby-portrait">
+          <svg viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="38" r="20" fill="#e3b7b0" opacity="0.5"/>
+            <path d="M30 78 Q50 55 70 78" stroke="#c9a54b" stroke-width="2.5" fill="none"/>
+            <circle cx="42" cy="35" r="2.5" fill="#2b2a25"/>
+            <circle cx="58" cy="35" r="2.5" fill="#2b2a25"/>
+            <path d="M44 45 Q50 49 56 45" stroke="#2b2a25" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="profile-name" id="babyFullName">Muhammad Fatih Al-Ghazali</div>
+        <div class="profile-sub" id="birthOrderText">Putra Pertama</div>
+
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Lahir</div>
+            <div class="detail-value" id="birthDate">12 Jun 2026</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Berat</div>
+            <div class="detail-value" id="birthWeight">3.2 kg</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Panjang</div>
+            <div class="detail-value" id="birthLength">49 cm</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Anak ke</div>
+            <div class="detail-value" id="birthOrderNum">1</div>
+          </div>
+        </div>
+
+        <div class="parents-line" id="parentsLine">
+          Ananda dari pasangan<br><strong>Bapak Ahmad Zainuddin &amp; Ibu Siti Nurhaliza</strong>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#c9a54b"/></svg><div class="line"></div></div>
+
+    <!-- ACARA -->
+    <section id="acara" class="reveal">
+      <div class="section-eyebrow">Insya Allah Akan Dilaksanakan</div>
+      <h2 class="section-title">Rangkaian Acara</h2>
+
+      <div class="countdown" id="countdown">
+        <div class="count-box"><div class="count-num" id="cd-days">00</div><div class="count-label">Hari</div></div>
+        <div class="count-box"><div class="count-num" id="cd-hours">00</div><div class="count-label">Jam</div></div>
+        <div class="count-box"><div class="count-num" id="cd-mins">00</div><div class="count-label">Menit</div></div>
+        <div class="count-box"><div class="count-num" id="cd-secs">00</div><div class="count-label">Detik</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="event-meta">
+          <div class="event-date" id="eventDateDisplay">Minggu, 20 Juli 2026</div>
+          <div class="event-time" id="eventTimeDisplay">09.00 WITA — Selesai</div>
+        </div>
+        <ol class="agenda-list" id="agendaList">
+          <li><span class="agenda-num">01</span><span>Pembukaan &amp; Sambutan Keluarga</span></li>
+          <li><span class="agenda-num">02</span><span>Prosesi Tasmiyah (Pemberian Nama)</span></li>
+          <li><span class="agenda-num">03</span><span>Prosesi Cukur Rambut &amp; Aqiqah</span></li>
+          <li><span class="agenda-num">04</span><span>Pembacaan Doa &amp; Tahlil</span></li>
+          <li><span class="agenda-num">05</span><span>Ramah Tamah &amp; Santap Bersama</span></li>
+        </ol>
+        <button class="btn-gold" id="icsBtn">＋ Tambahkan ke Kalender</button>
+      </div>
+    </section>
+
+    <div class="divider"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#c9a54b"/></svg><div class="line"></div></div>
+
+    <!-- LOKASI -->
+    <section id="lokasi" class="reveal">
+      <div class="section-eyebrow">Tempat Pelaksanaan</div>
+      <h2 class="section-title">Lokasi Acara</h2>
+
+      <div class="panel">
+        <div class="venue-name" id="venueName">Kediaman Bapak Ahmad Zainuddin</div>
+        <div class="address-box" id="venueAddress">Jl. Melati No. 45, Kec. Panakkukang,<br>Makassar, Sulawesi Selatan</div>
+        <iframe class="map-frame" id="mapFrame" src="https://maps.google.com/maps?q=Makassar%2C+Sulawesi+Selatan&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Peta Lokasi Acara"></iframe>
+        <button class="btn-gold" id="mapBtn">📍 Buka di Google Maps</button>
+        <button class="btn-gold" id="copyBtn" style="background:transparent; color:var(--emerald); border:1px solid var(--emerald);">⧉ Salin Alamat</button>
+      </div>
+    </section>
+
+    <div class="divider"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#c9a54b"/></svg><div class="line"></div></div>
+
+    <!-- UCAPAN -->
+    <section id="ucapan" class="reveal">
+      <div class="section-eyebrow">Doa &amp; Restu Anda</div>
+      <h2 class="section-title">Ucapan &amp; Konfirmasi</h2>
+
+      <div class="panel">
+        <form class="rsvp-form" id="wishForm">
+          <input type="text" id="wishName" placeholder="Nama Anda" required maxlength="60">
+          <div class="rsvp-options">
+            <label><input type="radio" name="rsvp" value="Hadir" checked><span>Hadir</span></label>
+            <label><input type="radio" name="rsvp" value="Tidak Hadir"><span>Tidak Hadir</span></label>
+            <label><input type="radio" name="rsvp" value="Ragu-ragu"><span>Masih Ragu</span></label>
+          </div>
+          <textarea id="wishMsg" rows="3" placeholder="Tuliskan doa &amp; ucapan untuk ananda..." required maxlength="300"></textarea>
+          <button type="submit" class="btn-gold" id="submitWish">Kirim Ucapan</button>
+          <div class="form-note">Ucapan Anda akan tersimpan dan dapat dilihat oleh tamu lain.</div>
+        </form>
+
+        <div class="wishes-list" id="wishesList">
+          <div class="wish-empty">Memuat ucapan...</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#c9a54b"/></svg><div class="line"></div></div>
+
+    <!-- PENUTUP -->
+    <section id="penutup" class="reveal">
+      <div class="section-eyebrow">Dengan Penuh Rasa Syukur</div>
+      <h2 class="section-title">Kata Penutup</h2>
+
+      <p class="doa-text">"Setiap anak tergadai dengan aqiqahnya, disembelihkan hewan untuknya pada hari ketujuh, dicukur rambutnya, dan diberi nama."</p>
+      <div style="text-align:center; font-size:12px; opacity:0.6; margin-top:8px;">— HR. Tirmidzi &amp; Abu Dawud (diringkas)</div>
+
+      <p class="closing-thanks">
+        Merupakan suatu kehormatan dan kebahagiaan bagi kami<br>
+        apabila Bapak/Ibu/Saudara-i berkenan hadir<br>
+        untuk memberikan doa restu bagi buah hati kami.<br><br>
+        Atas kehadiran dan doanya, kami ucapkan<br>terima kasih.
+      </p>
+
+      <div class="signature-family" id="hostFamily">Kel. Ahmad Zainuddin</div>
+    </section>
+
+    <footer>Dibuat dengan ♥ — Undangan Digital Aqiqah</footer>
+  </main>
+</div>
+
+<button id="musicBtn" aria-label="Putar/berhenti musik" title="Musik">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ======================================================
+     DATA UNDANGAN — EDIT BAGIAN INI SESUAI KEBUTUHAN ANDA
+     ====================================================== */
+  const invitationData = {
+    babyNickname: "Ziyad",
+    babyFullName: "Muhammad Ziyad Al-Gifari",
+    birthOrderText: "Buah Hati Tercinta",
+    birthOrderNum: "3",
+    birthDate: "15 Juni 2026",
+    birthWeight: "3.2 kg", // sesuaikan dengan data berat lahir sebenarnya
+    birthLength: "49 cm", // sesuaikan dengan data panjang lahir sebenarnya
+    parentsHtml: "Ananda dari pasangan<br><strong>Bapak Irfandi Gunawan &amp; Ibu Irma, S.Pd</strong>",
+    eventDateISO: "2026-07-13T09:00:00+08:00", // format waktu acara (untuk hitung mundur & kalender)
+    eventDateDisplay: "Senin, 13 Juli 2026",
+    eventTimeDisplay: "09.00 WITA — Selesai", // sesuaikan jam acara sebenarnya
+    venueName: "Kediaman Bapak Irfandi Gunawan",
+    venueAddress: "BTN Griya Lamaloang Blok H 17",
+    mapsQuery: "BTN Griya Lamaloang Blok H 17", // dipakai untuk embed peta & tombol buka Google Maps
+    hostFamily: "Kel. Irfandi Gunawan",
+    // Kosongkan AUDIO_URL untuk memakai musik ambient otomatis (generatif),
+    // atau isi dengan link mp3 Anda sendiri, contoh: "https://domainanda.com/musik.mp3"
+    AUDIO_URL: ""
+  };
+
+  /* ---------- Isi data ke halaman ---------- */
+  const params = new URLSearchParams(window.location.search);
+  const guestParam = params.get('to');
+  document.getElementById('guestName').textContent = guestParam ? decodeURIComponent(guestParam) : 'Tamu Undangan';
+
+  document.getElementById('coverBabyName').textContent = invitationData.babyNickname;
+  document.getElementById('coverBabyFull').textContent = invitationData.babyFullName.toUpperCase();
+  document.getElementById('babyFullName').textContent = invitationData.babyFullName;
+  document.getElementById('birthOrderText').textContent = invitationData.birthOrderText;
+  document.getElementById('birthDate').textContent = invitationData.birthDate;
+  document.getElementById('birthWeight').textContent = invitationData.birthWeight;
+  document.getElementById('birthLength').textContent = invitationData.birthLength;
+  document.getElementById('birthOrderNum').textContent = invitationData.birthOrderNum;
+  document.getElementById('parentsLine').innerHTML = invitationData.parentsHtml;
+  document.getElementById('eventDateDisplay').textContent = invitationData.eventDateDisplay;
+  document.getElementById('eventTimeDisplay').textContent = invitationData.eventTimeDisplay;
+  document.getElementById('venueName').textContent = invitationData.venueName;
+  document.getElementById('venueAddress').innerHTML = invitationData.venueAddress.replace(/, /g, ',<br>');
+  document.getElementById('hostFamily').textContent = invitationData.hostFamily;
+  document.getElementById('mapFrame').src = "https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery) + "&z=15&output=embed";
+
+  document.getElementById('mapBtn').addEventListener('click', function(){
+    window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(invitationData.mapsQuery + ' ' + invitationData.venueAddress), '_blank');
+  });
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    const text = invitationData.venueName + ", " + invitationData.venueAddress;
+    navigator.clipboard.writeText(text).then(function(){
+      const btn = document.getElementById('copyBtn');
+      const original = btn.textContent;
+      btn.textContent = "✓ Alamat Tersalin";
+      setTimeout(function(){ btn.textContent = original; }, 2000);
+    }).catch(function(){});
+  });
+
+  /* ---------- Cover open + reveal ---------- */
+  document.getElementById('openBtn').addEventListener('click', function(){
+    document.getElementById('cover').classList.add('hide');
+    document.getElementById('main').classList.add('show');
+    startMusic();
+    setTimeout(function(){
+      document.getElementById('cover').style.display = 'none';
+    }, 1000);
+  });
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); }
+    });
+  }, {threshold:0.15});
+  revealEls.forEach(function(el){ io.observe(el); });
+
+  /* ---------- Floating petals on cover ---------- */
+  const cover = document.getElementById('cover');
+  for(let i=0;i<14;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random()*100 + '%';
+    p.style.top = (-20 - Math.random()*100) + 'px';
+    p.style.animationDuration = (6 + Math.random()*6) + 's';
+    p.style.animationDelay = (Math.random()*5) + 's';
+    cover.appendChild(p);
+  }
+
+  /* ---------- Countdown ---------- */
+  const eventDate = new Date(invitationData.eventDateISO);
+  function updateCountdown(){
+    const now = new Date();
+    let diff = eventDate - now;
+    if(diff < 0) diff = 0;
+    const d = Math.floor(diff / (1000*60*60*24));
+    const h = Math.floor((diff / (1000*60*60)) % 24);
+    const m = Math.floor((diff / (1000*60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+    document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  /* ---------- Tambah ke Kalender (.ics) ---------- */
+  document.getElementById('icsBtn').addEventListener('click', function(){
+    function fmt(dt){
+      return dt.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    }
+    const start = eventDate;
+    const end = new Date(eventDate.getTime() + 3*60*60*1000);
+    const ics = [
+      'BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',
+      'SUMMARY:Aqiqah ' + invitationData.babyFullName,
+      'DTSTART:' + fmt(start),
+      'DTEND:' + fmt(end),
+      'LOCATION:' + invitationData.venueName + ', ' + invitationData.venueAddress,
+      'DESCRIPTION:Undangan Aqiqah & Tasyakuran ' + invitationData.babyFullName,
+      'END:VEVENT','END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], {type:'text/calendar'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Aqiqah-' + invitationData.babyNickname + '.ics';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  /* ---------- Musik ---------- */
+  let audioEl = null, synth = null, reverb = null, isPlaying = false, initialized = false;
+  const musicBtn = document.getElementById('musicBtn');
+
+  function initGenerativeMusic(){
+    reverb = new Tone.Reverb({decay:5, wet:0.4}).toDestination();
+    synth = new Tone.PolySynth(Tone.AMSynth, {
+      volume: -20,
+      envelope:{attack:1.2, decay:0.5, sustain:0.6, release:2.5}
+    }).connect(reverb);
+    const progression = [["C4","E4","G4"],["A3","C4","E4"],["F3","A3","C4"],["G3","B3","D4"]];
+    let step = 0;
+    Tone.Transport.scheduleRepeat(function(time){
+      const chord = progression[step % progression.length];
+      synth.triggerAttackRelease(chord, "1n", time);
+      step++;
+    }, "1n");
+  }
+
+  function startMusic(){
+    if(invitationData.AUDIO_URL){
+      if(!audioEl){
+        audioEl = new Audio(invitationData.AUDIO_URL);
+        audioEl.loop = true;
+        audioEl.volume = 0.5;
+      }
+      audioEl.play().then(function(){
+        isPlaying = true; musicBtn.classList.add('spinning');
+      }).catch(function(){});
+    } else {
+      Tone.start().then(function(){
+        if(!initialized){ initGenerativeMusic(); initialized = true; }
+        Tone.Transport.start();
+        isPlaying = true;
+        musicBtn.classList.add('spinning');
+      });
+    }
+  }
+
+  musicBtn.addEventListener('click', function(){
+    if(invitationData.AUDIO_URL && audioEl){
+      if(isPlaying){ audioEl.pause(); isPlaying=false; musicBtn.classList.remove('spinning'); }
+      else{ audioEl.play(); isPlaying=true; musicBtn.classList.add('spinning'); }
+    } else if(initialized){
+      if(isPlaying){ Tone.Transport.pause(); isPlaying=false; musicBtn.classList.remove('spinning'); }
+      else{ Tone.Transport.start(); isPlaying=true; musicBtn.classList.add('spinning'); }
+    } else {
+      startMusic();
+    }
+  });
+
+  /* ---------- Ucapan (RSVP + Buku Tamu, tersimpan bersama) ---------- */
+  const WISH_KEY = 'aqiqah-wishes-list';
+  const wishesListEl = document.getElementById('wishesList');
+  const wishForm = document.getElementById('wishForm');
+
+  function renderWishes(list){
+    if(!list || list.length === 0){
+      wishesListEl.innerHTML = '<div class="wish-empty">Jadilah yang pertama mengirimkan doa &amp; ucapan 🤍</div>';
+      return;
+    }
+    wishesListEl.innerHTML = list.slice().reverse().map(function(w){
+      const safeName = (w.name || 'Tamu').replace(/</g,'&lt;');
+      const safeMsg = (w.message || '').replace(/</g,'&lt;');
+      const safeStatus = (w.status || '').replace(/</g,'&lt;');
+      return '<div class="wish-item"><span class="wish-name">' + safeName + '</span><span class="wish-status">' + safeStatus + '</span><div class="wish-msg">' + safeMsg + '</div></div>';
+    }).join('');
+  }
+
+  async function loadWishes(){
+    try{
+      const result = await window.storage.get(WISH_KEY, true);
+      const list = result ? JSON.parse(result.value) : [];
+      renderWishes(list);
+    }catch(err){
+      renderWishes([]);
+    }
+  }
+
+  wishForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const submitBtn = document.getElementById('submitWish');
+    const name = document.getElementById('wishName').value.trim();
+    const msg = document.getElementById('wishMsg').value.trim();
+    const status = document.querySelector('input[name="rsvp"]:checked').value;
+    if(!name || !msg) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Mengirim...';
+    try{
+      let list = [];
+      try{
+        const existing = await window.storage.get(WISH_KEY, true);
+        list = existing ? JSON.parse(existing.value) : [];
+      }catch(err){ list = []; }
+      list.push({name:name, message:msg, status:status, ts:Date.now()});
+      await window.storage.set(WISH_KEY, JSON.stringify(list), true);
+      renderWishes(list);
+      wishForm.reset();
+      submitBtn.textContent = '✓ Terkirim';
+    }catch(err){
+      submitBtn.textContent = 'Gagal, coba lagi';
+    }
+    setTimeout(function(){ submitBtn.disabled = false; submitBtn.textContent = 'Kirim Ucapan'; }, 1800);
+  });
+
+  loadWishes();
+
+})();
+</script>
+</body>
+</html>
