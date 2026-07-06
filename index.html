@@ -419,7 +419,8 @@
     eventTimeDisplay: "09.00 WITA — Selesai", // sesuaikan jam acara sebenarnya
     venueName: "Kediaman Bapak Irfandi Gunawan",
     venueAddress: "BTN Griya Lamaloang Blok H 17",
-    mapsQuery: "-5,5541628, 120,1800210", // dipakai untuk embed peta & tombol buka Google Maps
+    mapsQuery: "BTN GRIYA LAMALOANG BLOK G NO. 03",
+    // dipakai untuk embed peta & tombol buka Google Maps
     hostFamily: "Kel. Irfandi Gunawan",
     // Kosongkan AUDIO_URL untuk memakai musik ambient otomatis (generatif),
     // atau isi dengan link mp3 Anda sendiri, contoh: "https://domainanda.com/musik.mp3"
@@ -444,15 +445,13 @@
   document.getElementById('venueName').textContent = invitationData.venueName;
   document.getElementById('venueAddress').innerHTML = invitationData.venueAddress.replace(/, /g, ',<br>');
   document.getElementById('hostFamily').textContent = invitationData.hostFamily;
-    // 1. Menampilkan peta kotak interaktif yang akurat sesuai koordinat Anda
-    // 1. Menampilkan peta kotak interaktif
+      // 1. Peta Interaktif (Menggunakan server resmi Google Maps)
   document.getElementById('mapFrame').src = "https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery) + "&t=&z=16&ie=UTF8&iwloc=&output=embed";
 
-  // 2. Mengatur fungsi klik tombol peta
+  // 2. Tombol Arah Jalan (Langsung membuka aplikasi Google Maps di HP tamu)
   document.getElementById('mapBtn').addEventListener('click', function(){
-    window.open("https://maps.google.com/maps?q=" + encodeURIComponent(invitationData.mapsQuery), '_blank');
+    window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(invitationData.mapsQuery), '_blank');
   });
-
   document.getElementById('hostFamily').textContent = invitationData.hostFamily;
       /* ---------- Pengaturan Peta dan Tombol Maps Terverifikasi ---------- */
   // 1. Menampilkan peta kotak interaktif yang akurat sesuai koordinat Anda
